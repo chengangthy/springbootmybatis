@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace的值是接口的全限定名字 -->
+<mapper namespace="com.baizhi.springboot.dao.AuctionDao">
+	<resultMap type="Auction" id="aa">
+		<id column="auction_id" property="auction_id"/>
+		<result column="auction_name" property="auction_name"/>
+		<result column="auction_start_time" property="auction_start_time"/>
+		<result column="auction_end_time" property="auction_end_time"/>
+		<result column="auction_desc" property="auction_desc"/>
+		<result column="auction_start_price" property="auction_start_price"/>
+		<result column="auction_pic" property="auction_pic"/>
+			<collection property="recordlist" ofType="Record">
+			<id column="id" property="id"/>
+			<result column="aid" property="user_id"/>
+			<result column="auid" property="auction_id"/>
+			<result column="auction_time" property="auction_time"/>
+			<result column="auction_price" property="auction_price"/>
+				<association property="user" javaType="User">
+					<id column="user_id" property="user_id"/>
+					<result column="user_name" property="user_name"/>
+				</association>
+			</collection>
+	</resultMap>
+
+	<select id="selectAll" resultType="Auction">
+	 select * from auction 
+   <where>
+      <if test="auction != null  and auction.auction_name !=null and auction.auction_name !='' ">
+             auction_name like '%'||#{auction.auction_name}||'%' 
+      </if>
+       <if test="auction != null and auction.auction_desc !=null  and auction.auction_desc !='' ">
+              and auction_desc like   '%'||#{auction.auction_desc}||'%'
+       </if> 
+       <if test=" auction != null and auction.auction_start_time != null">
+              and auction_start_time<![CDATA[ >= ]]>#{auction.auction_start_time}
+       </if>
+       <if test="auction != null and  auction.auction_end_time != null">
+              and auction_end_time<![CDATA[ <= ]]> #{auction.auction_end_time}
+       </if>
+       <if test="auction != null and  auction.auction_start_price != null">
+              and auction_start_price<![CDATA[ <= ]]>#{auction.auction_start_price}
+       </if>
+   </where>
+	</select>
+	
+	<!--  查询单个 -->
+	<select id="selectOne" resultType="Auction">
+	    select * from auction  where auction_id=#{auction_id}
+	</select>
+	
+	<!-- 删除 -->
+	<delete id="delete">
+	    delete from auction where auction_id=#{auction_id}
+	</delete>
+	
+	<!-- 修改 -->
+	 <update id="update">
+	      update auction set auction_name=#{auction_name},auction_start_price=#{auction_start_price},auction_start_time=#{auction_start_time},auction_end_time=#{auction_end_time},auction_upset=#{auction_upset},auction_pic=#{auction_pic},auction_desc=#{auction_desc} where  auction_id=#{auction_id}
+	 </update>
+	
+	
+	<!-- 添加商品 -->
+    <insert id="insert">
+       insert into auction values(0,#{auction_name},#{auction_start_price},#{auction_upset},#{auction_start_time},#{auction_end_time},#{auction_pic},#{auction_desc})
+    </insert>
+    
+    
+    <!-- 查询竞拍 -->
+    <select id="selcetRRR" resultMap="aa">
+    	select au.*,ar.id,ar.user_id aid,ar.auction_id auid,ar.auction_time,ar.auction_price,aur.user_id,aur.user_name  
+		from auction au left join auction_record ar 
+		on ar.auction_id = au.auction_id
+		left join auction_user aur
+		on  ar.user_id=aur.user_id
+		where au.auction_id=#{auction_id}
+		order by auction_price desc
+    </select>
+</mapper>

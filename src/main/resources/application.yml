@@ -1,0 +1,28 @@
+server:
+  context-path: /spring
+  port: 8088
+  jsp-servlet:
+    init-parameters:
+      development: true
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/baizhi
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+  mvc:
+    view:
+      prefix: /
+      suffix: .jsp
+    date-format: yyyy-MM-dd HH:mm:ss
+  http:
+    multipart:
+      max-file-size: 1000Mb
+      max-request-size: 10000Mb
+    encoding:
+      charset: utf-8
+      force: true
+mybatis:
+  type-aliases-package: com.baizhi.springboot.entity
+  mapper-locations: com/baizhi/springboot/dao/*Mapper.xml
